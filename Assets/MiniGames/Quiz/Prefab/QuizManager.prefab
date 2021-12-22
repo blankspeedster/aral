@@ -1,0 +1,127 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &3699470978316567695
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3699470978316567689}
+  - component: {fileID: 3699470978316567694}
+  m_Layer: 0
+  m_Name: QuizManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3699470978316567689
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3699470978316567695}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 885.2821, y: 548.5931, z: -237.25581}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &3699470978316567694
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3699470978316567695}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2a0ee8a5b30ee324d89d69ec1dd772c4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  QnA:
+  - Question: Which image shows 3 Doggos?
+    Answers:
+    - {fileID: 21300000, guid: 644a492dfbc3ab4458149edbf8cb7a30, type: 3}
+    - {fileID: 21300000, guid: 670a392f7a1a9494891d09efd46dedb1, type: 3}
+    - {fileID: 21300000, guid: e2b3489fde8f10f44a3b3dea21903b2c, type: 3}
+    - {fileID: 21300000, guid: 19f831a8f194dc643b5a6e2d68dfbc75, type: 3}
+    correctAnswer: 4
+  - Question: Which image shows 2 watermelon?s
+    Answers:
+    - {fileID: 21300000, guid: 7e0eb9a1f09ab8b4da995e1463257ffd, type: 3}
+    - {fileID: 21300000, guid: 45d63ae74d27397429f9b8c1017f2ca6, type: 3}
+    - {fileID: 21300000, guid: 98b0c9e11cd923d449b53f8b7ebb1e1f, type: 3}
+    - {fileID: 21300000, guid: bcf01e839c2b0c84c8b55c7d92290fc7, type: 3}
+    correctAnswer: 2
+  - Question: Which image shows 3 bags?
+    Answers:
+    - {fileID: 21300000, guid: c234e3375d9391e46a5c07886abad0b8, type: 3}
+    - {fileID: 21300000, guid: 12639774476191e4a9ad7efc4e56955d, type: 3}
+    - {fileID: 21300000, guid: 6aa4e8e72f38b7147ae62c9b9f831200, type: 3}
+    - {fileID: 21300000, guid: 73f73130ae994294bba764aec947014f, type: 3}
+    correctAnswer: 3
+  - Question: Which image shows 2 boxes?
+    Answers:
+    - {fileID: 21300000, guid: 24354499f30dea841a818f0505567ee6, type: 3}
+    - {fileID: 21300000, guid: 31da144577bd9044881fa68121e54027, type: 3}
+    - {fileID: 21300000, guid: 7955894255d5fca438ca8f015b629f5c, type: 3}
+    - {fileID: 21300000, guid: 459c8972dc5ea5542a7e8934c11520ff, type: 3}
+    correctAnswer: 4
+  - Question: Which image shows 1 butterfly?
+    Answers:
+    - {fileID: 21300000, guid: 000d94f88fcc0c943846eb26a1a58e65, type: 3}
+    - {fileID: 21300000, guid: 6db2b2825a3458f40a4f7765407dd3dc, type: 3}
+    - {fileID: 21300000, guid: f426585a2167ae8498687cf86861115c, type: 3}
+    - {fileID: 21300000, guid: b56da3c57f3b682428fc701dbeb502a3, type: 3}
+    correctAnswer: 1
+  - Question: Which image shows 5 cars?
+    Answers:
+    - {fileID: 21300000, guid: ed22e12f45fe2c84db913320b80349d2, type: 3}
+    - {fileID: 21300000, guid: df83786a7703df74183f141ddc2745b4, type: 3}
+    - {fileID: 21300000, guid: 4a7c2622723e6bf4a884f01aa0e34c89, type: 3}
+    - {fileID: 21300000, guid: 9d9c0bdc7c67123499d0a37278d80442, type: 3}
+    correctAnswer: 1
+  - Question: Which image shows 9 chairs?
+    Answers:
+    - {fileID: 21300000, guid: 5c8b724f5da042248b62b17a92f2a09b, type: 3}
+    - {fileID: 21300000, guid: 2149c2ad24d4dd041a3b025d5a579f00, type: 3}
+    - {fileID: 21300000, guid: 2cb66d463978cad468586fb5059f2c5e, type: 3}
+    - {fileID: 21300000, guid: 6c4bdd09e7dabec418e9fb3f39284ec6, type: 3}
+    correctAnswer: 2
+  - Question: Which image shows 3 shoes?
+    Answers:
+    - {fileID: 21300000, guid: 86c456349d0e216419713cf9ccc64745, type: 3}
+    - {fileID: 21300000, guid: fe46f4910679c7e44beacc41ca4f432f, type: 3}
+    - {fileID: 21300000, guid: 4d2a872ebbeed3e4fb31fcb1d4ccf0e6, type: 3}
+    - {fileID: 21300000, guid: 6578f37b6a458a24d8a8b8f5513a236d, type: 3}
+    correctAnswer: 3
+  - Question: Which image shows 7 sunflowers?
+    Answers:
+    - {fileID: 21300000, guid: fa52895ed251f2b4290d872166239a57, type: 3}
+    - {fileID: 21300000, guid: 012f89681b959324782ea1296f87a160, type: 3}
+    - {fileID: 21300000, guid: 4d538ec914729f14bb4a97306610982b, type: 3}
+    - {fileID: 21300000, guid: fdd952e38dc0e5e4fb882cbbae74de57, type: 3}
+    correctAnswer: 3
+  - Question: Which image shows 10 Teddybears?
+    Answers:
+    - {fileID: 21300000, guid: 3f95f970a651208449ab69feff152891, type: 3}
+    - {fileID: 21300000, guid: 5c10f5b19f7bb9644bd51765938cb0da, type: 3}
+    - {fileID: 21300000, guid: f7862bd6d2abc7c4c901b12155bff257, type: 3}
+    - {fileID: 21300000, guid: 8ef4708c11e3eb04ba062ee13844c7b5, type: 3}
+    correctAnswer: 1
+  options:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  currentQuestion: 0
+  QuestionText: {fileID: 0}
+  scoreText: {fileID: 0}
+  wrongAns: 0
+  QuizPanel: {fileID: 0}
+  GameOverPanel: {fileID: 0}
