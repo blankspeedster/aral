@@ -15,7 +15,7 @@ public class LoginScript : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        PlayerPrefs.SetString("url","http://localhost/aral-web-app/");
+        PlayerPrefs.SetString("url","http://localhost/aral-web-app");
         errorTextObject.SetActive(false);
     }
 
@@ -37,7 +37,7 @@ public class LoginScript : MonoBehaviour
 
         string message = null;
 
-        string url = $"{baseURL}process_registration.php?login_game=1&email={_email}&password={_password}";
+        string url = $"{baseURL}/process_registration.php?login_game=1&email={_email}&password={_password}";
 
         var client = new HttpClient();
         var request = new HttpRequestMessage
