@@ -1,0 +1,669 @@
+var fp_ajax_skip_History = false;
+var fp_ajax_click = false;
+var fp_ajax_spawn_lightbox = false;
+var fp_ajax_lightbox_ready = false;
+var fp_ajax_spawn_lightbox_card = false;
+var fp_ajax_url_key;
+
+jQuery( function($) {
+	// This is history.js ajax support
+	$.getScript('/javascripts/2011/libs/jquery.history.js', function(){
+    // Prepare
+    var History = window.History; // Note: We are using a capital H instead of a lower h
+    if ( !History.enabled ) {
+         // History.js is disabled for this browser.
+         // This is because we can optionally choose to support HTML4 browsers or not.
+        return false;
+    }
+   // Bind to StateChange Event
+    History.Adapter.bind(window,'statechange',function() { // Note: We are using statechange instead of popstate
+				if (!fp_ajax_skip_History) {
+					if (!fp_ajax_click && $('.lightbox').length > 0 ) {
+						$('.lightbox').trigger('fadeOut');
+					} else {
+    		console.log("statechange:"+History.getState().url);
+    		console.log("fp_ajax_spawn_lightbox:"+fp_ajax_spawn_lightbox);
+						if (fp_ajax_spawn_lightbox) {
+							fp_create_lightbox();
+						}
+						var State = History.getState();
+						$('#ajax_handler_div').load(State.url);
+					}
+				}
+				fp_ajax_spawn_lightbox = false;
+				fp_ajax_skip_History = false;
+				fp_ajax_click = false;
+    });
+    bindAjaxLinks();
+	});
+
+	// This is to make sure the user gets the hover effect on things like the Add an Image or Video dropdowns.
+	// http://cherne.net/brian/resources/jquery.hoverIntent.html
+	$.getScript('/javascripts/2011/libs/jquery.hoverIntent.min.js', function(){
+		$('.user-dropdown').hoverIntent({
+			over: function() {
+					$(this).addClass('hover');
+				}, 
+			timeout: 250,
+			out: function() {
+				$(this).removeClass('hover');
+				}
+		});
+		
+		$('.input-dropdown').hoverIntent({
+			over: function() {
+					$(this).addClass('hover');
+				}, 
+			timeout: 250,
+			out: function() {
+				$(this).removeClass('hover');
+				}
+		});
+	});
+	
+	// For all the popup modal windows.
+	// http://leanmodal.finelysliced.com.au/
+	$.getScript('/javascripts/2011/libs/jquery.leanModal.min.js', function(){
+		$('a.modal').click( function() {
+			$('.modal-wrap:visible').hide();
+		}).leanModal();
+		$("a[rel*=modalGallery]").click( function(){
+			$('.modal-wrap').hide();
+		}).leanModal();	
+	});
+	
+	// All the sliders.
+	// http://cssglobe.com/post/5780/easy-slider-17-numeric-navigation-jquery-slider
+	if( $('#my-clubs').length > 0 || $('#page-footer').length > 0 || $('#about').length > 0 || $('#home .tab_container ul.list').length > 0 || $('#home-content .controls li').length > 0 ) {
+		$.getScript('/javascripts/2011/libs/jquery.easySlider.js', function(){
+			$('#my-clubs .wall-slider').easySlider({
+				prevId: 'wall-prev',
+				nextId: 'wall-next',
+				speed: 400,
+				overflow: false,
+				buttonClass: 'ir'
+			});
+			
+			$('#page-footer .wrap').easySlider({
+				prevId: 'footer-prev',
+				nextId: 'footer-next',
+				speed: 400,
+				buttonClass: 'ir'
+			});
+			
+			$('#about .slider').easySlider({
+				speed: 400,
+				numeric: true,
+				nextClass: 'next'
+			});
+			
+			$('#home .tab_container .wrap')
+			.parent().append('<span class="ir next">Next</span><span class="ir prev">Previous</span>').end()
+			.easySlider({
+				prevClass: 'prev',
+				nextClass: 'next',
+				speed: 400,
+				continuous: true,
+				controlsShow: false
+			});
+			
+			$('#content-tabs').each( function() {
+				$(".tab_container", this).children().hide().first().show();
+				$("ul.tabs a", this).click(function() {
+					$(this).addClass("active").parent().siblings().children().removeClass('active');
+					$(".tab_container").children().hide();
+			
+					var activeTab = $(this).attr("href");
+					$(activeTab).fadeIn();
+					return false;
+				}).first().addClass('active');
+			});
+			
+			$('#home-content .controls .wrap').easySlider({
+				speed: 400,
+				buttonClass: 'ir'
+			});
+			
+		});
+	}
+	
+	// For styling of input[type=file]
+	// https://github.com/mamuso/jquery.prettyfile
+	if( $('input[type=file].replace').length > 0 ) {
+		$.getScript('/javascripts/2011/libs/jquery.prettyfile.js', function(){
+			$('input[type=file].replace').prettyfile({
+				html: "<span class='button'>Choose File</span><span class='file'>No file selected</span>",
+				phclass: 'file',
+				phcontclass: 'wrap'
+			});
+			
+			$('#article-new a.add').click(function() {
+				$('<input type="file" class="replace" />').insertBefore( this).wrap('<div class="image cf" />').before('<span class="alignright">JPEG, GIF, or PNG, Max 10 MB<br />Resized if over 560 x 560</span>').prettyfile({
+					html: "<span class='button'>Choose File</span><span class='file'>No file selected</span>",
+					phclass: 'file',
+					phcontclass: 'wrap'
+				});
+			});
+		});
+	}
+	
+	add_image_browser_scrollbar();
+	
+	$('#slideshow .slides li .image').each( function() {
+		$(this).width( $(this).find('img').width() );
+	});
+	
+	// $('#slideshow .slides-wrap .ir').css( 'top', $('#slideshow .slides .image img').height() / 2 );
+	
+	/* This was the image viewer slideshow but we removed that functionality so that the ads could reload for each image.
+	
+	if( $('#slideshow .slides li').length > 0 ) {		
+		$.getScript('/javascripts/2011/libs/jquery.cycle.js', function(){
+			$prev = $('<a href="#" class="nc ir prev">Previous</a>').appendTo( $('#slideshow .slides-wrap') );
+			$next = $('<a href="#" class="nc ir next">Next</a>').appendTo( $('#slideshow .slides-wrap') );
+			$('#slideshow .slides').height( $('#slideshow .slides li:first').height() );
+			$('#slideshow .slides li .image').each( function() {
+				$(this).width( $(this).find('img').width() );
+			});
+			$('#slideshow .slides').cycle({
+				fx: 'fade',
+				prev: $prev,
+				next: $next,
+				timeout: 0,
+				speed: 500,
+				pager: $('#slideshow .thumbs'),
+				pagerAnchorBuilder: function(idx, slide) { 
+					// return selector string for existing anchor 
+					return '#slideshow .thumbs li:eq(' + idx + ')'; 
+				},
+				before: function() {
+					$('#slideshow .slides').animate({
+						height: $(this).outerHeight()
+					});
+					
+					$('#slideshow .ir').animate({
+						top: $(this).find('img').height()/2
+					});
+				}
+			});
+		});
+	} */
+	
+	// HTML5 placeholder support for inputs	
+	if( !$.support.placeholder && $('input[placeholder]').length > 0 ) {;	
+		$.getScript('/javascripts/2011/libs/jquery.placeholder.js', function(){
+			$('input[placeholder]').placeholder();
+		});
+	}
+});
+
+// This is the little scrolling bit at the top of the image browser
+// http://jscrollpane.kelvinluck.com/
+function add_image_browser_scrollbar() {
+	if( $('#image-browser .thumbs').length > 0 ) {
+		$.getScript('/javascripts/2011/libs/jquery.jscrollpane.min.js', function(){
+			thumbW = 0;
+			$('#image-browser .thumbs li').each( function() {
+				thumbW = thumbW + $(this).outerWidth(true);
+			}).parent().width( thumbW+70 ).parent().jScrollPane({
+				contentWidth: thumbW+70,
+				hideFocus: true
+			});
+		});
+	}
+}
+
+var bindAjaxLinks = function(scope) {
+	//console.log('binding called on');
+	//console.log(scope);
+	//alert('History: '+History.enabled);
+	if ( !History.enabled ) {
+		// History.js is disabled for this browser.
+		// This is because we can optionally choose to support HTML4 browsers or not.
+		return false;
+	}
+	$('a.ajax',scope).unbind('click.ajax');
+	$('a.ajax',scope).bind('click.ajax', function(event) {
+			event.preventDefault();
+			if ($(this).hasClass("clicked")) {
+				// Already clicked - do nothing
+			} else {
+				fp_ajax_click = true;
+				if (typeof ga !== 'undefined') {
+					linktype = $(this).attr("class");
+					if (typeof linktype === 'undefined') {
+						linktype = "unknown";
+					} else {
+						linktype = linktype.replace(/ *ajax */g, " ");
+						linktype = linktype.replace(/ +/g, " ");
+						linktype = linktype.trim();
+					}
+					if (linktype == "left") {
+						if (typeof next_depth !== "undefined") {
+							next_depth = next_depth + 1;
+							if (next_depth >= 10) {
+								ga_event('ajax', linktype, next_depth );
+							} else {
+								ga_event('ajax', linktype, "<10");
+							}
+						} else {
+							ga_event('ajax', linktype, next_depth );
+						}
+					} else if (linktype == "right") {
+						if (typeof prev_depth !== "undefined") {
+							prev_depth = prev_depth + 1;
+							if (prev_depth >= 10) {
+								ga_event('ajax', linktype, prev_depth );
+							} else {
+								ga_event('ajax', linktype, "<10");
+							}
+						} else {
+							ga_event('ajax', linktype);
+						}
+					} else if (/targetlightbox/.test(linktype)) {
+						linktype = linktype.replace(/ *targetlightbox */g, " ");
+						linktype = linktype.replace(/ +/g, " ");
+						linktype = linktype.trim();
+						ga_event('ajax', 'targetlightbox', linktype);
+					} else {
+						ga_event('ajax', linktype );
+					}
+				}
+				if ($(this).hasClass('targetlightbox')) {
+					var target_href = $(this).attr('href')
+					if (target_href) {
+						target_href = target_href.replace(/^[^\/]*\/\/[^\/]+/, '')
+						fp_ajax_spawn_lightbox = true;
+						if ($(this).parents('.contentcard').length > 0) {
+							//fp_ajax_spawn_lightbox_card = $(this).parents('.contentcard');
+							fp_ajax_spawn_lightbox_card = false;
+							if ($(this).parents('#lightboxcardcontainer').length > 0) {
+								$(this).parents('#lightboxcardcontainer').siblings('.more_cards_link').empty();
+								$(this).parents('#lightboxcardcontainer').empty();
+							}
+						} else {
+							fp_ajax_spawn_lightbox_card = false;
+						}
+						if ($('.lightbox').length > 0) {
+							// If lightbox already exists, replace state instead of push state
+							try {
+								History.replaceState(null, null, target_href);
+							} catch(e) {
+								console.warn(e)
+							}
+						} else {
+							try {
+								History.pushState(null, null, target_href);
+							} catch(e) {
+								console.warn(e)
+							}
+						}
+						fp_ajax_url_key = window.location.href;
+					} else {
+						try {
+							History.pushState(null, null, target_href);
+						} catch(e) {
+							console.warn(e)
+						}
+						fp_ajax_url_key = window.location.href;
+					}
+				}
+			}
+	});
+};
+
+var next_depth = 0;
+var prev_depth = 0;
+
+var fp_create_missing_lightbox = function(callback_function) {
+	if ( $('.lightbox').length == 0 ) {
+		fp_create_lightbox(callback_function);
+	} else {
+		if (callback_function && typeof(callback_function) === "function") {
+			if (fp_ajax_lightbox_ready) {
+				callback_function();
+			} else {
+				setTimeout(function() { fp_create_missing_lightbox(callback_function); }, 200);
+			}
+		}
+	}
+}
+var fp_create_lightbox = function(callback_function) {
+	if (false) {
+		$('.lightbox').remove();
+		// Loading and fade in lightbox
+		$('<div class="lightbox"><div class="lb_loading"></div></div>').insertBefore('footer');
+		bindLightboxFunctions();
+		$('.lightbox').trigger('fadeIn', [callback_function]);
+	} else {
+		if (true || $('.lightbox').length == 0) {
+			if ($('.lightbox').length > 0) {
+				$('.lightbox').remove();
+			}
+			// New lightbox
+			$('<div class="lightbox" style="transition: background-color 0.4s;display:block;background-color: rgba(0,0,0,0)"><div class="close-icon"></div><div class="lb_loading" style="display:none"></div></div>').insertBefore('footer');
+			$('body').addClass('lightbox-open');
+			bindLightboxFunctions();
+			if (fp_ajax_spawn_lightbox_card == false) {
+				//$('.lightbox').trigger('fadeIn', [callback_function]);
+				fp_ajax_lightbox_ready = true;
+				var dup_viewport = $('<div class="viewport" style="padding: 8px 0 3px 0"><div class="bottom-spacer"></div></div>').css("width",'').prepend($('#cardcontainer').clone().attr('id','lightboxcardcontainer').addClass('lightboxcardcontainer').css('margin-bottom','100px').empty());
+				$('html').addClass('noscroll');
+				if (callback_function && typeof(callback_function) === "function") callback_function();
+				dup_viewport.prependTo($('.lightbox'));
+				if (typeof bindKeyActions === "function") {
+					bindKeyActions();
+				}
+				if (typeof ios7_lightbox !== "undefined" && ios7_lightbox == true) {
+					$('#cardcontainer').addClass('blur');
+					$('.lightbox').css("background-color", "rgba(0,0,0,0.4)");
+				} else {
+					$('.lightbox').css("background-color", "rgba(0,0,0,0.85)");
+				}					
+				var current_window_width = $(window).width();
+				var lightbox_width = current_window_width;
+				if (lightbox_width > 2576) {
+					lightbox_width = 2556;
+				} else if (lightbox_width > 2254) {
+					lightbox_width = 2234;
+				} else if (lightbox_width > 1932) {
+					lightbox_width = 1912;
+				} else if (lightbox_width > 1610) {
+					lightbox_width = 1590;
+				} else if (lightbox_width > 1288) {
+					lightbox_width = 1268;
+				} else if (lightbox_width > 966) {
+					lightbox_width = 946;
+				} else {
+					lightbox_width = 624;
+				}
+				$('.lightbox .viewport').css({'padding':'', 'margin':''});
+				$('#lightboxcardcontainer').css({'width':lightbox_width+"px", 'margin-top':'39px'}); // Allow container to animate to width specified in cards.css file
+				$('#lightboxcardcontainer').masonry({
+					itemSelector: '.contentcard',
+					//isFitWidth: true,
+					columnWidth:302,
+					gutter: 20,
+					isAnimated: false,
+					transitionDuration: 0
+				});
+				$('#lightboxcardcontainer').masonry( 'on', 'layoutComplete', function( msnryInstance, laidOutItems ) {
+						//console.log('Masonry layout completed on ' + laidOutItems.length + ' items');
+						$.each(laidOutItems, (function(i, value) {
+								$(value.element).addClass('masonry-complete');
+						}));
+				} )
+			} else {
+				fp_ajax_lightbox_ready = true;
+				var dup_viewport = $('<div class="viewport" style="padding: 8px 0 3px 0"><div class="bottom-spacer"></div></div>').css("width",'').prepend($('#cardcontainer').clone().attr('id','lightboxcardcontainer').addClass('lightboxcardcontainer').css('margin-bottom','100px').empty());
+				$('html').addClass('noscroll');
+				if (callback_function && typeof(callback_function) === "function") callback_function();
+				dup_viewport.prependTo($('.lightbox'));
+				if (typeof bindKeyActions === "function") {
+					bindKeyActions();
+				}
+				
+				// Pause for a moment then begin animation
+				var lb_card = fp_ajax_spawn_lightbox_card.clone().css({margin: "0 0 20px 0", top:(parseInt(fp_ajax_spawn_lightbox_card.css("top"))+58-$(window).scrollTop())+"px", left:(parseInt(fp_ajax_spawn_lightbox_card.css("left"))+8)+"px"}).appendTo($('#lightboxcardcontainer'));
+				if (lb_card.hasClass('photocontentcard')) {
+					$('.card-body .card-body-image a.imagelink img', lb_card).first().attr('src', lb_card.attr('data-image'));
+				}
+				//This next line simply looks up the value of a css value that has changed which "locks in" any earlier css changes - otherwise, css changes have not occurred yet; alternatively a setTimeout of 0 works as well
+				//$('#lightboxcardcontainer').css("width");
+				if (typeof ios7_lightbox !== "undefined" && ios7_lightbox == true) {
+					$('#cardcontainer').addClass('blur');
+					$('.lightbox').css("background-color", "rgba(255,255,255,0.4)");
+				} else {
+					$('.lightbox').css("background-color", "rgba(255,255,255,0.85)");
+				}					
+				var current_window_width = $(window).width();
+				var lightbox_width = current_window_width;
+				if (lightbox_width > 2576) {
+					lightbox_width = 2556;
+				} else if (lightbox_width > 2254) {
+					lightbox_width = 2234;
+				} else if (lightbox_width > 1932) {
+					lightbox_width = 1912;
+				} else if (lightbox_width > 1610) {
+					lightbox_width = 1590;
+				} else if (lightbox_width > 1288) {
+					lightbox_width = 1268;
+				} else if (lightbox_width > 966) {
+					lightbox_width = 946;
+				} else {
+					lightbox_width = 624;
+				}
+				$('.lightbox .viewport').css({'padding':'', 'margin':''});
+				$('#lightboxcardcontainer').css({'width':lightbox_width+"px", 'margin-top':'39px'}); // Allow container to animate to width specified in cards.css file
+				lb_card.css({top:0, left:0});
+				$('#lightboxcardcontainer').masonry({
+					itemSelector: '.contentcard',
+					//isFitWidth: true,
+					columnWidth:302,
+					gutter: 20,
+					isAnimated: false,
+					transitionDuration: 0
+				});
+				$('#lightboxcardcontainer').masonry( 'on', 'layoutComplete', function( msnryInstance, laidOutItems ) {
+						//console.log('Masonry layout completed on ' + laidOutItems.length + ' items');
+						$.each(laidOutItems, (function(i, value) {
+								$(value.element).addClass('masonry-complete');
+						}));
+						return true;
+				} );
+
+			}
+		} else {
+			//var lb_card = fp_ajax_spawn_lightbox_card.clone().addClass("animate").css({margin: "0 0 20px 0", top:(parseInt(fp_ajax_spawn_lightbox_card.css("top"))-$(window).scrollTop()+10)+"px", left:(parseInt(fp_ajax_spawn_lightbox_card.css("left"))+10)+"px"}).appendTo($('#lightboxcardcontainer'));
+			if (fp_ajax_spawn_lightbox_card == false) {
+			} else {
+				if (false) {
+					var lb_card = fp_ajax_spawn_lightbox_card.clone().css({margin: "0 0 20px 0", display: "none"});
+					$('#lightboxcardcontainer').prepend(lb_card);
+					lb_card.addClass('animate');
+					var lightbox_cards = $('#lightboxcardcontainer .contentcard').not(fp_ajax_spawn_lightbox_card);
+					//var lightbox_cards = $('#lightboxcardcontainer .contentcard');
+					//lightbox_cards.remove();
+					//$('#lightboxcardcontainer').masonry();
+					//$('#lightboxcardcontainer').append(lb_card).masonry('appended', lb_card);
+					$('.lightbox .viewport').unbind('scroll');
+					$('#lightboxcardcontainer').siblings('.more_cards_link').empty();
+					$('#lightboxcardcontainer').masonry('remove', lightbox_cards);
+					window.setTimeout(function() {
+							$('#lightboxcardcontainer').masonry('remove', fp_ajax_spawn_lightbox_card);
+							$('#lightboxcardcontainer').masonry();
+							window.setTimeout(function() {
+								$('.lightbox .viewport').scrollTop(0);
+								$('#lightboxcardcontainer').masonry('prepended', lb_card).masonry();
+								
+							}, 400);
+					}, 400);
+					//$('#lightboxcardcontainer').masonry('remove', fp_ajax_spawn_lightbox_card).masonry();
+					//$('#lightboxcardcontainer').append(lb_card).masonry('appended', lb_card).masonry();
+				} else {
+					var lightbox_cards = $('#lightboxcardcontainer .contentcard').not(fp_ajax_spawn_lightbox_card);
+					$('.lightbox .viewport').unbind('scroll');
+					$('#lightboxcardcontainer').siblings('.more_cards_link').empty();
+					//$('#lightboxcardcontainer').masonry('remove', lightbox_cards);
+					lightbox_cards.remove();
+					masonry_reflow($('#lightboxcardcontainer'));
+					$('.lightbox .viewport').scrollTop(0);
+				}
+			}
+		}
+	}
+}
+var eventtemp;
+var bindLightboxFunctions = function() {
+	$('.lightbox').click( function(e) {
+			if (e.srcElement) {
+				targetElement = e.srcElement;
+			} else if (e.target) {
+				targetElement = e.target;
+			}
+			if (targetElement && (targetElement===$(this)[0] || ( $(targetElement).hasClass("close-icon") || $(targetElement).hasClass("viewport") || $(targetElement).hasClass("contents") || $(targetElement).hasClass("cardcolumn") || $(targetElement).hasClass("lightboxcardcontainer")))) {
+				$(this).trigger('fadeOut', function () {
+					if (typeof bindKeyActions === "function") { // lightbox has been removed - need to rebind cursor keys
+						bindKeyActions();
+					}
+				});
+				fp_ajax_skip_History = true;
+				fp_ajax_back_button = true;
+				History.back();
+			}
+	});
+	$('.lightbox').bind('fill', function(e, obj) {
+			obj.addClass('contents').css('display','none');
+			lightboxobj = $(this);
+			lightboxobj.append(obj);
+			$(this).children('.lb_loading').fadeOut("fast", function() {
+				testvar = $(this).children('.lb_loading');
+				lightboxobj.children('.contents').fadeIn("fast");
+			});
+	});
+	$('.lightbox').bind('fadeIn', function(e, callback_function) {
+			fp_ajax_lightbox_ready = false;
+			//fadeBackground = $('<div></div>').css({'display':'none', 'position':'fixed', 'top':'0', 'bottom':'0', 'left':'0', 'right':'0', 'background-color':'rgba(255,255,255,1)', 'z-index':'9999'});
+			//fadeBackground.insertAfter($(this));
+			lightboxobj=$(this);
+			lightboxobj.css('background-color','rgba(255,255,255,.75)');
+			//fadeBackground.fadeIn("fast", function() {
+			lightboxobj.fadeIn("fast", function() {
+					$('.ad').css('visibility','hidden');
+					$('html').addClass('noscroll');
+					//lightboxobj.css('display','block');
+					//fadeBackground.fadeOut("fast", function() {
+							//fadeBackground.remove();
+							fp_ajax_lightbox_ready = true;
+							if (callback_function && typeof(callback_function) === "function") callback_function();
+					//});
+			});
+	});
+	$('.lightbox').bind('fadeOut', function(e, callback_function) {
+			if (false) {
+				fp_ajax_lightbox_ready = false;
+				fadeBackground = $('<div></div>').css({'display':'none', 'position':'fixed', 'top':'0', 'bottom':'0', 'left':'0', 'right':'0', 'background-color':'rgba(255,255,255,1)', 'z-index':'9999'});
+				fadeBackground.insertAfter($(this));
+				lightboxobj=$(this);
+				fadeBackground.fadeIn("fast", function() {
+						$('.ad').css('visibility','visible');
+						$('html').removeClass('noscroll');
+						lightboxobj.css('display','none');
+						if (typeof ios7_lightbox !== "undefined" && ios7_lightbox == true) {
+							$('#cardcontainer').removeClass('blur');
+						}
+						fadeBackground.fadeOut("fast", function() {
+								fadeBackground.remove();
+								lightboxobj.remove();
+								$('body').removeClass('lightbox-open');
+								if (typeof callback_function === "function") {
+									callback_function();
+								}
+						});
+				});
+			} else {
+				fp_ajax_lightbox_ready = false;
+				lightboxobj=$(this);
+				lightboxobj.css('display','none');
+				$('.ad').css('visibility','visible');
+				$('html').removeClass('noscroll');
+				lightboxobj.remove();
+				$('body').removeClass('lightbox-open');
+				if (typeof callback_function === "function") {
+					callback_function();
+				}
+			}
+	});
+};
+
+
+////// GA EVENT HANDLING
+var gaevent_queue = gaevent_queue || [];
+var ga_event = ga_event || function() {
+		gaevent_queue.push(arguments);
+		if (typeof ga_event_queue_execute !== "undefined") {
+			ga_event_queue_execute();
+		}
+}
+var ga_event_execute = function(category, action, label, value, optional_param) {
+	// do not run any ga_events unless category starts with !
+	if (/^!/.test(category)==false) {
+		return false;
+	}
+	//console.log("ga('send', 'event', '"+category+"', '"+action+"', '"+label+"', '"+value+"', '"+optional_param+"')");
+	if (typeof ga !== 'undefined') {
+		if (typeof label === 'object') {
+			ga('send', 'event', category, action, label);
+		}	else if (typeof label === 'undefined') {
+			ga('send', 'event', category, action);
+		} else if (typeof value === 'object') {
+			ga('send', 'event', category, action, label, value);
+		} else if (typeof value === 'undefined') {
+			ga('send', 'event', category, action, label);
+		} else if (typeof optional_param === 'object') {
+			ga('send', 'event', category, action, label, value, optional_param);
+		} else {
+			ga('send', 'event', category, action, label, value);
+		}			
+	}
+};
+var ga_event_queue_execute = function() {
+	//console.log("gaevent_queue.length = "+gaevent_queue.length);
+	while (gaevent_queue.length > 0) {
+		event = gaevent_queue.shift();
+		execute = true;
+		if(event[0]=='ad') { // ad events should be divided by 1000
+			rand = Math.floor(Math.random()*1000);
+			if (rand != 0) {
+				execute = false;
+			}
+		}
+		if (execute) {
+			ga_event_execute(event[0], event[1], event[2], event[3], event[4]);
+		}
+	}
+};
+( function() {
+		ga_event_queue_execute();
+})();
+////// END GA EVENT HANDLING
+
+jQuery.support.placeholder = (function(){
+    var i = document.createElement('input');
+    return 'placeholder' in i;
+})();
+
+(function($){
+	$.fn.extend({
+ 
+		selectbox : function(options) {
+			if(false && (!$.browser.msie || ($.browser.msie&&$.browser.version>6))){
+				return this.each(function() {
+	  
+					var currentSelected = $(this).find(':selected');
+					$(this).after('<span class="select"><span class="select-inner">'+currentSelected.text()+'</span></span>').css({position:'absolute', opacity:0,fontSize:$(this).next().css('font-size')});
+					var selectBoxSpan = $(this).next();
+					selectBoxSpan.addClass( $(this).attr('class') );
+					var selectBoxWidth = parseInt($(this).width()) - parseInt(selectBoxSpan.css('padding-left')) -parseInt(selectBoxSpan.css('padding-right'));			
+					var selectBoxSpanInner = selectBoxSpan.find(':first-child');
+					selectBoxSpan.css({width:selectBoxWidth, display:'inline-block'});
+					selectBoxSpanInner.css({width:selectBoxWidth, display:'inline-block'});
+					var selectBoxHeight = parseInt(selectBoxSpan.height()) + parseInt(selectBoxSpan.css('padding-top')) + parseInt(selectBoxSpan.css('padding-bottom'));
+					$(this).height(selectBoxHeight).change(function(){
+						// selectBoxSpanInner.text($(this).val()).parent().addClass('changed');   This was not ideal
+						selectBoxSpanInner.text($(this).find(':selected').text()).parent().addClass('changed');
+					});
+				});
+			}
+		}
+	});
+})(jQuery);
+
+
+window.log = function(){
+  log.history = log.history || [];  
+  log.history.push(arguments);
+  arguments.callee = arguments.callee.caller;  
+  if(this.console) console.log( Array.prototype.slice.call(arguments) );
+};
+(function(b){function c(){}for(var d="assert,count,debug,dir,dirxml,error,exception,group,groupCollapsed,groupEnd,info,log,markTimeline,profile,profileEnd,time,timeEnd,trace,warn".split(","),a;a=d.pop();)b[a]=b[a]||c})(window.console=window.console||{});

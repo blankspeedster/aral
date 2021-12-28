@@ -21,15 +21,15 @@ public class ScoreUi : MonoBehaviour
         }
     }
 
-    public void ApplyScore()
-    {
+    // public void ApplyScore()
+    // {
      
-        newScore = Quiz.score;
-        newName = Quiz.namePlayer;
-        //scoreManager.AddScore(new Score(name1:"Jc",score:2002));
+    //     newScore = Quiz.score;
+    //     newName = Quiz.namePlayer;
+    //     //scoreManager.AddScore(new Score(name1:"Jc",score:2002));
 
-        scoreManager.AddScore(new Score(name1:newName, score:newScore));
+    //     scoreManager.AddScore(new Score(name1:newName, score:newScore));
 
         
-    }
+    // }
 }

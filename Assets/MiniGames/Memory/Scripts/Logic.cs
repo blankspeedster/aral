@@ -1,4 +1,4 @@
-﻿/*		credits: xtase studios - http://xtasestudios.com/scripts		*/
+﻿
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using System.Collections;
@@ -11,16 +11,6 @@ public class Logic : MonoBehaviour {
 
 	[SerializeField]
 	GameObject triggerObject;
-	
-	// Use this for initialization
-	void Start () {
-	
-	}
-	
-	// Update is called once per frame
-	void Update () {
-	
-	}
 	
 	public void CheckCards(MemoryCard mc){
 		if(cards[0] == null)

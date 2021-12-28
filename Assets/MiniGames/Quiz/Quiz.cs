@@ -11,7 +11,7 @@ public class Quiz : MonoBehaviour
    public int currentQuestion;
    public Text QuestionText;
    public Text scoreText;
-   public Text scoreSaveText;
+  // public Text scoreSaveText;
    int totalQuestions;
    public static int score;
   
@@ -20,18 +20,18 @@ public class Quiz : MonoBehaviour
 
    public GameObject QuizPanel;
    public GameObject GameOverPanel;
-   public GameObject scoreSavePanel;
+  // public GameObject scoreSavePanel;
 
-   public static string namePlayer = "NewPlayer";
-   public Text nameInput;
+   //public static string namePlayer = "NewPlayer";
+  // public Text nameInput;
 
 
    private void Start() {
-       namePlayer = nameInput.text;
+     //  namePlayer = nameInput.text;
       // namePlayer = nameInput.text.ToString();
        totalQuestions = QnA.Count;
        GameOverPanel.SetActive(false);
-       scoreSavePanel.SetActive(false);
+   //    scoreSavePanel.SetActive(false);
     //   QuizPanel.SetActive(true);
        GenerateQuestions();
        
@@ -50,12 +50,12 @@ public class Quiz : MonoBehaviour
        QuizPanel.SetActive(false);
         score =  totalQuestions - wrongAns;   
         scoreText.text = score + " / " + totalQuestions; 
-        scoreSaveText.text = score.ToString();
+      //  scoreSaveText.text = score.ToString();
    }
 
    public void ScoreSave() {
        GameOverPanel.SetActive(false);
-       scoreSavePanel.SetActive(true);
+     //  scoreSavePanel.SetActive(true);
       
    }
 
