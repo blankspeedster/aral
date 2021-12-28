@@ -15,7 +15,7 @@ public class LoginScript : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        PlayerPrefs.SetString("url","http://aral.jjjwelry.com/");
+        PlayerPrefs.SetString("url","http://localhost/aral-web-app");
         errorTextObject.SetActive(false);
     }
 

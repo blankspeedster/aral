@@ -1,25 +1,25 @@
- using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using System;
 using System.Net.Http;
 using System.Net.Http.Headers;
-
 public class LeaderboardTrigger : MonoBehaviour
 {
 
     public GameObject scoreboardCanvas;
     public GameObject inputCanvas;
     public Text leaderBoardText;
+    public int subjectId;
     // Start is called before the first frame update
     void Awake()
     {
-@ -19,12 +15,11 @@ public class LeaderboardTrigger : MonoBehaviour
+        scoreboardCanvas.gameObject.SetActive(false);
+        
         
     }
 
-    async private void OnTriggerEnter(Collider other) {
     private void OnTriggerEnter(Collider other) {
         if (other.tag == "Player")
         {
@@ -29,7 +29,9 @@ public class LeaderboardTrigger : MonoBehaviour
         }
     }
 
-@ -34,40 +29,5 @@ public class LeaderboardTrigger : MonoBehaviour
+    public void CloseCanvas()
+    {
+        scoreboardCanvas.gameObject.SetActive(false);
         inputCanvas.gameObject.SetActive(true);
     }
 
@@ -39,7 +41,7 @@ public class LeaderboardTrigger : MonoBehaviour
 
         string message = null;
 
-        string url = $"{baseURL}/process_section.php?score_board=1&userId={_userId}";
+        string url = $"{baseURL}/process_section.php?score_board={subjectId}&userId={_userId}";
 
         var client = new HttpClient();
         var request = new HttpRequestMessage
